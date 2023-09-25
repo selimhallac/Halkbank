@@ -2,7 +2,7 @@
 
 namespace Phpdev;
 
-class WsseAuthHeader extends SoapHeader
+class WsseAuthHeader extends \SoapHeader
 {
     private $wssNs = 'http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd';
     private $wsuNs = 'http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd';
@@ -14,7 +14,7 @@ class WsseAuthHeader extends SoapHeader
         $created = gmdate('Y-m-d\TH:i:s\Z');
         $nonce = mt_rand();
         $encodedNonce = base64_encode(pack('H*', sha1(pack('H*', $nonce) . pack('a*', $created) . pack('a*', $password))));
-        $root = new SimpleXMLElement('<root/>');
+        $root = new \SimpleXMLElement('<root/>');
         $security = $root->addChild('wsse:Security', null, $this->wssNs);
         $usernameToken = $security->addChild('wsse:UsernameToken', null, $this->wssNs);
         $usernameToken->addChild('wsse:Username', $username, $this->wssNs);
@@ -26,7 +26,7 @@ class WsseAuthHeader extends SoapHeader
         $root->registerXPathNamespace('wsse', $this->wssNs);
         $full = $root->xpath('/root/wsse:Security');
         $auth = $full[0]->asXML();
-        parent::SoapHeader($this->wssNs, 'Security', new SoapVar($auth, XSD_ANYXML), true);
+        parent::__construct($this->wssNs, 'Security', new \SoapVar($auth, XSD_ANYXML), true);
 
     }
 }
@@ -50,7 +50,7 @@ Class Halkbank{
         $this->password       = $password;
         $this->customerno     = $customerno;
         $wsse_header = new WsseAuthHeader($username, $password); 
-        $this->client = new SoapClient("https://webservice.halkbank.com.tr/HesapEkstreOrtakWS/HesapEkstreOrtak.svc?wsdl");
+        $this->client = new \SoapClient("https://webservice.halkbank.com.tr/HesapEkstreOrtakWS/HesapEkstreOrtak.svc?wsdl");
         $this->client->__setSoapHeaders(array($wsse_header));
     }
 
